@@ -12,19 +12,25 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
+  <style>
+  html {
+    scroll-behavior: smooth;
+  }
+</style>
 </head>
 <body class="bg-gray-900 text-white flex h-screen overflow-hidden">
   <!-- SIDEBAR -->
-  <aside class="w-64 bg-gray-800 flex flex-col py-8 px-4">
+  <aside class="w-64 bg-gray-800 flex flex-col py-8 px-4 ">
     <div class="mb-12">
       <span class="text-3xl font-bold text-lime-400">X</span>
       <span class="text-3xl font-bold text-white">plore</span>
     </div>
-    <nav class="flex flex-col gap-6 text-lg font-semibold">
-      <a href="#" class="text-white hover:text-lime-400">Popular Games</a>
-      <a href="#" class="text-white hover:text-lime-400">New and Trending Games</a>
-      <a href="#" class="text-white hover:text-lime-400">Best Games</a>
-    </nav>
+ <nav class="flex flex-col mt-14 gap-12 text-lg font-semibold">
+  <a href="#popular" class="text-white hover:text-lime-400">Popular Games</a>
+  <a href="#new-trending" class="text-white hover:text-lime-400">New and Trending Games</a>
+  <a href="#best" class="text-white hover:text-lime-400">Best Games</a>
+</nav>
+
   </aside>
 
   <!-- MAIN SECTION -->
@@ -35,8 +41,8 @@
           <!-- Genre input -->
           <div class="relative flex-1">
             <input id="genreInput" name="genres"
-              class="w-full rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
-              placeholder="Preferred Genres" autocomplete="off" />
+              class="w-full rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-lime-400"
+              placeholder="Genres (comma-separated)" autocomplete="off" />
             <ul id="genreSuggestions"
               class="absolute left-0 right-0 mt-1 bg-gray-800 text-white rounded-md shadow-lg hidden max-h-48 overflow-y-auto z-50">
             </ul>
@@ -45,8 +51,8 @@
           <!-- Tag input -->
           <div class="relative flex-1">
             <input id="tagInput" name="tags"
-              class="w-full rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
-              placeholder="Preferred Tags" autocomplete="off" />
+              class="w-full rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-lime-400"
+              placeholder="Tags (comma-separated)" autocomplete="off" />
             <ul id="tagSuggestions"
               class="absolute left-0 right-0 mt-1 bg-gray-800 text-white rounded-md shadow-lg hidden max-h-48 overflow-y-auto z-50">
             </ul>
@@ -58,63 +64,72 @@
           </button>
         </form>
       </header>
-    <!-- GAME SECTIONS -->
-
+      <!-- Main Content -->
     <section class="px-10 py-6 space-y-12">
-      <!----Recommendations-->
-            {% if result is not none and result|length > 0 %}
-        <div class="relative mt-12">
-          <h2 class="text-2xl font-bold mb-6 text-lime-400">RECOMMENDED GAMES</h2>
-          <div class="overflow-hidden relative">
-            <div class="scroll-container flex gap-8 overflow-x-auto pb-4 hide-scrollbar pr-10">
-              {% for game in result %}
-                <div class="min-w-[320px] bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col">
-                  {% if game.background_image %}
-                    <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-full h-48 object-cover">
-                  {% endif %}
-                  <div class="p-5 flex flex-col flex-1">
-                    <h3 class="text-xl font-bold mb-2">{{ game.name }}</h3>
-                    <div class="text-gray-400 text-sm mb-1">Release: {{ game.released }}</div>
-                    <div class="text-gray-300 text-sm mb-1">
-                      Genres: <span class="text-white">{{ game.genre_text }}</span>
+      <!-- Recommendations Section -->
+          <div class="relative mt-12">
+            <h2 class="text-2xl font-bold mb-6 text-lime-400">RECOMMENDED GAMES</h2>
+
+            {% if result is none %}
+              <p class="text-gray-500 italic">Search to begin Recommendations</p>
+
+            {% elif result|length == 0 %}
+              <p class="text-gray-400 italic">No games matched your preferences. Try other genres or tags.</p>
+
+            {% else %}
+              <div class="overflow-hidden relative">
+                <div class="scroll-container flex gap-8 overflow-x-auto pb-4 hide-scrollbar pr-10">
+                  {% for game in result %}
+                    <div class="min-w-[320px] bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col">
+                      {% if game.background_image %}
+                        <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-full h-48 object-cover">
+                      {% endif %}
+                      <div class="p-5 flex flex-col flex-1">
+                        <h3 class="text-xl font-bold mb-2">{{ game.name }}</h3>
+                        <div class="text-gray-400 text-sm mb-1">Release: {{ game.released }}</div>
+                        <div class="text-gray-300 text-sm mb-1">
+                          Genres: <span class="text-white">{{ game.genre_text }}</span>
+                        </div>
+                        <div class="text-gray-300 text-sm mb-1">
+                          Tags:
+                          {% set tags = game.tag_text.split(',') %}
+                          {% for tag in tags[:3] %}
+                            <span class="text-white">{{ tag.strip()[:12] }}</span>{% if not loop.last %}, {% endif %}
+                          {% endfor %}
+                        </div>
+                        <div class="flex items-center justify-between mt-auto pt-4">
+                          <span class="text-lime-400 text-lg font-bold">{{ game.rating }}</span>
+                          <svg class="w-5 h-5 text-lime-400 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <polygon points="10,1 12.59,7.36 19.51,7.36 13.97,11.64 16.56,17.99 10,13.71 3.44,17.99 6.03,11.64 0.49,7.36 7.41,7.36"/>
+                          </svg>
+                        </div>
+                      </div>
                     </div>
-                    <div class="text-gray-300 text-sm mb-1">
-                      Tags:
-                      {% set tags = game.tag_text.split(',') %}
-                      {% for tag in tags[:3] %}
-                        <span class="text-white">{{ tag.strip()[:12] }}</span>{% if not loop.last %}, {% endif %}
-                      {% endfor %}
-                    </div>
-                    <div class="flex items-center justify-between mt-auto pt-4">
-                      <span class="text-lime-400 text-lg font-bold">{{ game.rating }}</span>
-                      <svg class="w-5 h-5 text-lime-400 inline" fill="currentColor" viewBox="0 0 20 20">
-                        <polygon points="10,1 12.59,7.36 19.51,7.36 13.97,11.64 16.56,17.99 10,13.71 3.44,17.99 6.03,11.64 0.49,7.36 7.41,7.36"/>
-                      </svg>
-                    </div>
-                  </div>
+                  {% endfor %}
                 </div>
-              {% endfor %}
-            </div>
 
-            <!-- Right Scroll Button -->
-            <button
-              type="button"
-              onclick="this.parentElement.querySelector('.scroll-container').scrollBy({left: 340, behavior: 'smooth'})"
-              class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-700 bg-opacity-80 hover:bg-lime-400 text-white hover:text-gray-900 rounded-full p-2 shadow-lg z-10 transition"
-              aria-label="Scroll right"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+                <!-- Right Scroll Button -->
+                <button
+                  type="button"
+                  onclick="this.parentElement.querySelector('.scroll-container').scrollBy({left: 340, behavior: 'smooth'})"
+                  class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-700 bg-opacity-80 hover:bg-lime-400 text-white hover:text-gray-900 rounded-full p-2 shadow-lg z-10 transition"
+                  aria-label="Scroll right"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            {% endif %}
           </div>
-        </div>
-      {% endif %}
 
-      {% set sections = [("POPULAR GAMES", popular_games), ("NEW AND TRENDING GAMES", new_trending_games), ("BEST GAMES", trending_games)] %}
-      {% for title, games in sections %}
-        <div class="relative">
-          <h2 class="text-2xl font-bold mb-6">{{ title }}</h2>
+      {% set sections = [("POPULAR GAMES", popular_games, "popular"), 
+                   ("NEW AND TRENDING GAMES", new_trending_games, "new-trending"), 
+                   ("BEST GAMES", trending_games, "best")] %}
+
+{% for title, games, section_id in sections %}
+  <div class="relative" id="{{ section_id }}">
+    <h2 class="text-2xl font-bold mb-6">{{ title }}</h2>
           <div class="overflow-hidden relative">
             <div class="scroll-container flex gap-8 overflow-x-auto pb-4 hide-scrollbar pr-10">
               {% for game in games %}
@@ -159,56 +174,46 @@
     </section>
   </main>
 </body>
+
 <script>
-  const genres = {{ all_genres|tojson }};
-  const tags = {{ all_tags|tojson }};
+  const genresList = {{ all_genres | tojson | safe }};
+  const tagsList = {{ all_tags | tojson | safe }};
+</script>
+<script>
+  function setupAutocomplete(inputId, dataList) {
+    const input = document.querySelector(`input[name=${inputId}]`);
+    const box = document.createElement('div');
+    box.classList.add('absolute', 'bg-gray-700', 'text-white', 'rounded', 'mt-1', 'z-50', 'max-h-40', 'overflow-y-auto', 'w-full', 'shadow-lg');
+    box.style.display = 'none';
+    input.parentNode.appendChild(box);
 
-  function setupAutocomplete(inputId, ulId, dataset) {
-    const input = document.getElementById(inputId);
-    const ul = document.getElementById(ulId);
-
-    input.addEventListener("input", () => {
-      const rawVal = input.value;
-      const parts = rawVal.split(",");
-      const current = parts[parts.length - 1].trim().toLowerCase();
-
-      ul.innerHTML = "";
-
-      if (!current) {
-        ul.classList.add("hidden");
-        return;
-      }
-
-      const filtered = dataset
-        .filter(item => item.toLowerCase().includes(current))
-        .slice(0, 5);
-
-      filtered.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        li.className = "px-4 py-2 hover:bg-lime-400 hover:text-gray-900 cursor-pointer";
-        li.onclick = () => {
-          parts[parts.length - 1] = " " + item; // replace current with selected
-          input.value = parts.join(", ").replace(/\s+,/g, ","); // clean format
-          ul.classList.add("hidden");
-        };
-        ul.appendChild(li);
+    input.addEventListener('input', () => {
+      const current = input.value.split(',').pop().trim().toLowerCase();
+      box.innerHTML = '';
+      if (!current) return (box.style.display = 'none');
+      const matches = dataList.filter(item => item.toLowerCase().includes(current));
+      matches.forEach(match => {
+        const option = document.createElement('div');
+        option.classList.add('cursor-pointer', 'hover:bg-lime-400', 'px-4', 'py-2');
+        option.textContent = match;
+        option.addEventListener('click', () => {
+          const parts = input.value.split(',');
+          parts[parts.length - 1] = match;
+          input.value = parts.join(', ') + ', ';
+          box.style.display = 'none';
+        });
+        box.appendChild(option);
       });
-
-      ul.classList.toggle("hidden", filtered.length === 0);
+      box.style.display = matches.length ? 'block' : 'none';
     });
 
-    document.addEventListener("click", (e) => {
-      if (!input.parentElement.contains(e.target)) ul.classList.add("hidden");
-    });
+    input.addEventListener('blur', () => setTimeout(() => (box.style.display = 'none'), 100));
   }
 
-  window.onload = () => {
-    setupAutocomplete("genreInput", "genreSuggestions", genres);
-    setupAutocomplete("tagInput", "tagSuggestions", tags);
-  };
+  // Attach to both input boxes
+  setupAutocomplete('genres', genresList);
+  setupAutocomplete('tags', tagsList);
 </script>
 
-
-
+</body>
 </html>

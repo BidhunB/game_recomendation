@@ -85,9 +85,16 @@ def home():
     popular_games = popular_games[["name", "genre_text", "tag_text", "rating", "background_image"]].to_dict(orient="records")
     result = None
     
-    # Extract unique genres and tags for autocomplete
-    all_genres = sorted(set(df_all['genre_text'].str.split().sum()))
-    all_tags = sorted(set(df_all['tag_text'].str.split().sum()))
+    # Extract unique genres and tags from the dataset
+    def extract_unique_terms(series):
+        return sorted(set(
+            item.strip().title()
+            for sublist in series.dropna().str.split()
+            for item in sublist
+        ))
+
+    all_genres = extract_unique_terms(df_all['genre_text'])
+    all_tags = extract_unique_terms(df_all['tag_text'])
 
 
     if df_all is None:
@@ -120,7 +127,8 @@ def home():
         new_trending_games=new_trending_games,
         all_genres=all_genres,
         all_tags=all_tags
-    )
+)
+
      
      
 if __name__ == '__main__':
