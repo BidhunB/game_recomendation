@@ -1,107 +1,141 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Game Recommendations</title>
-  </head>
-  <body class="bg-gray-100 min-h-screen">
-    <div class="max-w-2xl mx-auto py-10">
-      <h1 class="text-4xl font-bold text-center text-red-600 mb-8">🎮 Game Recommendations</h1>
-      <form method="post" class="mb-8 bg-white p-6 rounded shadow">
-        <label class="block mb-2 font-semibold">Preferred Genres (comma separated):</label>
-        <input name="genres" class="w-full mb-4 p-2 border rounded" placeholder="e.g. Action, Adventure">
-        <label class="block mb-2 font-semibold">Preferred Tags (comma separated):</label>
-        <input name="tags" class="w-full mb-4 p-2 border rounded" placeholder="e.g. Multiplayer, Singleplayer">
-        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded">Get Recommendations</button>
-      </form>
-
-      <!-- Popular Games Section -->
-      <div class="mb-10">
-        <h2 class="text-2xl font-bold text-blue-700 mb-4">🔥 Popular Games</h2>
-        <div class="space-y-4">
-          {% for game in popular_games %}
-            <div class="bg-white rounded-lg shadow p-4 flex items-center">
-              {% if game.background_image %}
-                <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-24 h-16 object-cover rounded mr-4">
-              {% endif %}
-              <div>
-                <h3 class="text-xl font-semibold">{{ game.name }}</h3>
-                <div><span class="font-semibold">Genres:</span> {{ game.genre_text }}</div>
-                <div><span class="font-semibold">Tags:</span> {{ game.tag_text }}</div>
-                <div><span class="font-semibold">Rating:</span> <span class="text-yellow-600">{{ game.rating }}</span></div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Trending Games Section -->
-      <div class="mb-10">
-        <h2 class="text-2xl font-bold text-purple-700 mb-4">🚀 Trending Games</h2>
-        <div class="space-y-4">
-          {% for game in trending_games %}
-            <div class="bg-white rounded-lg shadow p-4 flex items-center">
-              {% if game.background_image %}
-                <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-24 h-16 object-cover rounded mr-4">
-              {% endif %}
-              <div>
-                <h3 class="text-xl font-semibold">{{ game.name }}</h3>
-                <div><span class="font-semibold">Release:</span> {{ game.released }}</div>
-                <div><span class="font-semibold">Genres:</span> {{ game.genre_text }}</div>
-                <div><span class="font-semibold">Tags:</span> {{ game.tag_text }}</div>
-                <div><span class="font-semibold">Rating:</span> <span class="text-yellow-600">{{ game.rating }}</span></div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- New & Trending Games Section -->
-      <div class="mb-10">
-        <h2 class="text-2xl font-bold text-pink-700 mb-4">🆕 New & Trending</h2>
-        <div class="space-y-4">
-          {% for game in new_trending_games %}
-            <div class="bg-white rounded-lg shadow p-4 flex items-center">
-              {% if game.background_image %}
-                <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-24 h-16 object-cover rounded mr-4">
-              {% endif %}
-              <div>
-                <h3 class="text-xl font-semibold">{{ game.name }}</h3>
-                <div><span class="font-semibold">Release:</span> {{ game.released }}</div>
-                <div><span class="font-semibold">Genres:</span> {{ game.genre_text }}</div>
-                <div><span class="font-semibold">Tags:</span> {{ game.tag_text }}</div>
-                <div><span class="font-semibold">Rating:</span> <span class="text-yellow-600">{{ game.rating }}</span></div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Recommendations Section -->
-      {% if result is not none %}
-        <h2 class="text-2xl font-bold text-green-700 mb-4">🎯 Recommended Games</h2>
-        {% if result %}
-          <div class="space-y-4">
-            {% for game in result %}
-              <div class="bg-white rounded-lg shadow p-4 flex items-center">
-                {% if game.background_image %}
-                  <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-24 h-16 object-cover rounded mr-4">
-                {% endif %}
-                <div>
-                  <h3 class="text-xl font-semibold">{{ game.name }}</h3>
-                  <div><span class="font-semibold">Genres:</span> {{ game.genre_text }}</div>
-                  <div><span class="font-semibold">Tags:</span> {{ game.tag_text }}</div>
-                  <div><span class="font-semibold">Rating:</span> <span class="text-yellow-600">{{ game.rating }}</span></div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="text-center text-gray-500 text-lg">No recommendations to show.</div>
-        {% endif %}
-      {% endif %}
+<!-- filepath: c:\mini-main\game_recomendation\templates\index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Xplore - Game Recommendations</title>
+  <style>
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white flex h-screen overflow-hidden">
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-gray-800 flex flex-col py-8 px-4">
+    <div class="mb-12">
+      <span class="text-3xl font-bold text-lime-400">X</span>
+      <span class="text-3xl font-bold text-white">plore</span>
     </div>
-  </body>
+    <nav class="flex flex-col gap-6 text-lg font-semibold">
+      <a href="#" class="text-white hover:text-lime-400">Popular Games</a>
+      <a href="#" class="text-white hover:text-lime-400">New and Trending Games</a>
+      <a href="#" class="text-white hover:text-lime-400">Best Games</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN SECTION -->
+  <main class="flex-1 overflow-y-auto">
+       <!-- Header -->
+      <header class="bg-gray-900 px-10 py-6 flex items-center gap-6">
+        <form method="post" class="flex gap-4 w-full max-w-3xl">
+          <input name="genres" class="flex-1 rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none" placeholder="Preferred Genres" />
+          <input name="tags" class="flex-1 rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none" placeholder="Preferred Tags" />
+          <button type="submit" class="bg-lime-400 text-gray-900 font-bold px-8 py-2 rounded-full hover:bg-lime-300 transition">SEARCH</button>
+        </form>
+      </header>
+    <!-- GAME SECTIONS -->
+
+    <section class="px-10 py-6 space-y-12">
+      <!----Recommendations-->
+            {% if result is not none %}
+        <div class="relative mt-12">
+          <h2 class="text-2xl font-bold mb-6 text-lime-400">RECOMMENDED GAMES</h2>
+          <div class="overflow-hidden relative">
+            <div class="scroll-container flex gap-8 overflow-x-auto pb-4 hide-scrollbar pr-10">
+              {% for game in result %}
+                <div class="min-w-[320px] bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col">
+                  {% if game.background_image %}
+                    <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-full h-48 object-cover">
+                  {% endif %}
+                  <div class="p-5 flex flex-col flex-1">
+                    <h3 class="text-xl font-bold mb-2">{{ game.name }}</h3>
+                    <div class="text-gray-400 text-sm mb-1">Release: {{ game.released }}</div>
+                    <div class="text-gray-300 text-sm mb-1">
+                      Genres: <span class="text-white">{{ game.genre_text }}</span>
+                    </div>
+                    <div class="text-gray-300 text-sm mb-1">
+                      Tags:
+                      {% set tags = game.tag_text.split(',') %}
+                      {% for tag in tags[:3] %}
+                        <span class="text-white">{{ tag.strip()[:12] }}</span>{% if not loop.last %}, {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class="flex items-center justify-between mt-auto pt-4">
+                      <span class="text-lime-400 text-lg font-bold">{{ game.rating }}</span>
+                      <svg class="w-5 h-5 text-lime-400 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <polygon points="10,1 12.59,7.36 19.51,7.36 13.97,11.64 16.56,17.99 10,13.71 3.44,17.99 6.03,11.64 0.49,7.36 7.41,7.36"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Right Scroll Button -->
+            <button
+              type="button"
+              onclick="this.parentElement.querySelector('.scroll-container').scrollBy({left: 340, behavior: 'smooth'})"
+              class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-700 bg-opacity-80 hover:bg-lime-400 text-white hover:text-gray-900 rounded-full p-2 shadow-lg z-10 transition"
+              aria-label="Scroll right"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      {% endif %}
+
+      {% set sections = [("POPULAR GAMES", popular_games), ("NEW AND TRENDING GAMES", new_trending_games), ("BEST GAMES", trending_games)] %}
+      {% for title, games in sections %}
+        <div class="relative">
+          <h2 class="text-2xl font-bold mb-6">{{ title }}</h2>
+          <div class="overflow-hidden relative">
+            <div class="scroll-container flex gap-8 overflow-x-auto pb-4 hide-scrollbar pr-10">
+              {% for game in games %}
+                <div class="min-w-[320px] bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col">
+                  {% if game.background_image %}
+                    <img src="{{ game.background_image }}" alt="{{ game.name }} image" class="w-full h-48 object-cover">
+                  {% endif %}
+                  <div class="p-5 flex flex-col flex-1">
+                    <h3 class="text-xl font-bold mb-2">{{ game.name }}</h3>
+                    <div class="text-gray-400 text-sm mb-1">Release: {{ game.released }}</div>
+                    <div class="text-gray-300 text-sm mb-1">Genres: <span class="text-white">{{ game.genre_text }}</span></div>
+                    <div class="text-gray-300 text-sm mb-1">
+                      Tags:
+                      {% set tags = game.tag_text.split(',') %}
+                      {% for tag in tags[:3] %}
+                        <span class="text-white">{{ tag.strip()[:12] }}</span>{% if not loop.last %}, {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class="flex items-center justify-between mt-auto pt-4">
+                      <span class="text-lime-400 text-lg font-bold">{{ game.rating }}</span>
+                      <svg class="w-5 h-5 text-lime-400 inline" fill="currentColor" viewBox="0 0 20 20"><polygon points="10,1 12.59,7.36 19.51,7.36 13.97,11.64 16.56,17.99 10,13.71 3.44,17.99 6.03,11.64 0.49,7.36 7.41,7.36"></polygon></svg>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Right Scroll Button -->
+            <button
+              type="button"
+              onclick="this.parentElement.querySelector('.scroll-container').scrollBy({left: 340, behavior: 'smooth'})"
+              class="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-700 bg-opacity-80 hover:bg-lime-400 text-white hover:text-gray-900 rounded-full p-2 shadow-lg z-10 transition"
+              aria-label="Scroll right"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+
+
 </html>

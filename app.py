@@ -69,7 +69,7 @@ def home():
     trending_games_df = df_all.copy()
     trending_games_df['released'] = pd.to_datetime(trending_games_df['released'], errors='coerce')
     trending_games_df = trending_games_df.dropna(subset=['released'])
-    trending_games_df = trending_games_df.sort_values(by=["rating", "released"], ascending=[False, False]).head(5)
+    trending_games_df = trending_games_df.sort_values(by=["rating", "released"], ascending=[False, False]).head(10)
     trending_games = trending_games_df[["name", "genre_text", "tag_text", "rating", "background_image", "released"]].to_dict(orient="records")
 
     # New & Trending
@@ -77,11 +77,11 @@ def home():
     new_trending_df['released'] = pd.to_datetime(new_trending_df['released'], errors='coerce')
     new_trending_df = new_trending_df.dropna(subset=['released'])
     new_trending_df = new_trending_df[new_trending_df['rating'] > 0]
-    new_trending_df = new_trending_df.sort_values(by=["released", "rating"], ascending=[False, False]).head(5)
+    new_trending_df = new_trending_df.sort_values(by=["released", "rating"], ascending=[False, False]).head(10)
     new_trending_games = new_trending_df[["name", "genre_text", "tag_text", "rating", "background_image", "released"]].to_dict(orient="records")
 
     # Popular (from all-time)
-    popular_games = df_all.sort_values(by="rating", ascending=False).head(5)
+    popular_games = df_all.sort_values(by="rating", ascending=False).head(10)
     popular_games = popular_games[["name", "genre_text", "tag_text", "rating", "background_image"]].to_dict(orient="records")
     result = None
 
@@ -101,7 +101,7 @@ def home():
         if selected_input:
             user_vector = vectorizer_all.transform([selected_input])
             similarity_scores = cosine_similarity(user_vector, tfidf_matrix_all)
-            top_indices = similarity_scores.argsort()[0][::-1][:3]
+            top_indices = similarity_scores.argsort()[0][::-1][:5]
             recommended_games_df = df_all.iloc[top_indices]
             result = recommended_games_df[["name", "genre_text", "tag_text", "rating", "background_image"]].to_dict(orient="records")
         else:
