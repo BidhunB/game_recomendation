@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">
+
+  </script>
   <title>Xplore - Game Recommendations</title>
   <style>
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -29,17 +31,38 @@
   <main class="flex-1 overflow-y-auto">
        <!-- Header -->
       <header class="bg-gray-900 px-10 py-6 flex items-center gap-6">
-        <form method="post" class="flex gap-4 w-full max-w-3xl">
-          <input name="genres" class="flex-1 rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none" placeholder="Preferred Genres" />
-          <input name="tags" class="flex-1 rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none" placeholder="Preferred Tags" />
-          <button type="submit" class="bg-lime-400 text-gray-900 font-bold px-8 py-2 rounded-full hover:bg-lime-300 transition">SEARCH</button>
+        <form method="post" class="flex gap-4 w-full max-w-3xl relative z-50">
+          <!-- Genre input -->
+          <div class="relative flex-1">
+            <input id="genreInput" name="genres"
+              class="w-full rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+              placeholder="Preferred Genres" autocomplete="off" />
+            <ul id="genreSuggestions"
+              class="absolute left-0 right-0 mt-1 bg-gray-800 text-white rounded-md shadow-lg hidden max-h-48 overflow-y-auto z-50">
+            </ul>
+          </div>
+
+          <!-- Tag input -->
+          <div class="relative flex-1">
+            <input id="tagInput" name="tags"
+              class="w-full rounded-full px-6 py-2 bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+              placeholder="Preferred Tags" autocomplete="off" />
+            <ul id="tagSuggestions"
+              class="absolute left-0 right-0 mt-1 bg-gray-800 text-white rounded-md shadow-lg hidden max-h-48 overflow-y-auto z-50">
+            </ul>
+          </div>
+
+          <button type="submit"
+            class="bg-lime-400 text-gray-900 font-bold px-8 py-2 rounded-full hover:bg-lime-300 transition">
+            SEARCH
+          </button>
         </form>
       </header>
     <!-- GAME SECTIONS -->
 
     <section class="px-10 py-6 space-y-12">
       <!----Recommendations-->
-            {% if result is not none %}
+            {% if result is not none and result|length > 0 %}
         <div class="relative mt-12">
           <h2 class="text-2xl font-bold mb-6 text-lime-400">RECOMMENDED GAMES</h2>
           <div class="overflow-hidden relative">
@@ -136,6 +159,56 @@
     </section>
   </main>
 </body>
+<script>
+  const genres = {{ all_genres|tojson }};
+  const tags = {{ all_tags|tojson }};
+
+  function setupAutocomplete(inputId, ulId, dataset) {
+    const input = document.getElementById(inputId);
+    const ul = document.getElementById(ulId);
+
+    input.addEventListener("input", () => {
+      const rawVal = input.value;
+      const parts = rawVal.split(",");
+      const current = parts[parts.length - 1].trim().toLowerCase();
+
+      ul.innerHTML = "";
+
+      if (!current) {
+        ul.classList.add("hidden");
+        return;
+      }
+
+      const filtered = dataset
+        .filter(item => item.toLowerCase().includes(current))
+        .slice(0, 5);
+
+      filtered.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        li.className = "px-4 py-2 hover:bg-lime-400 hover:text-gray-900 cursor-pointer";
+        li.onclick = () => {
+          parts[parts.length - 1] = " " + item; // replace current with selected
+          input.value = parts.join(", ").replace(/\s+,/g, ","); // clean format
+          ul.classList.add("hidden");
+        };
+        ul.appendChild(li);
+      });
+
+      ul.classList.toggle("hidden", filtered.length === 0);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!input.parentElement.contains(e.target)) ul.classList.add("hidden");
+    });
+  }
+
+  window.onload = () => {
+    setupAutocomplete("genreInput", "genreSuggestions", genres);
+    setupAutocomplete("tagInput", "tagSuggestions", tags);
+  };
+</script>
+
 
 
 </html>

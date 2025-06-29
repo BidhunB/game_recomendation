@@ -84,6 +84,11 @@ def home():
     popular_games = df_all.sort_values(by="rating", ascending=False).head(10)
     popular_games = popular_games[["name", "genre_text", "tag_text", "rating", "background_image"]].to_dict(orient="records")
     result = None
+    
+    # Extract unique genres and tags for autocomplete
+    all_genres = sorted(set(df_all['genre_text'].str.split().sum()))
+    all_tags = sorted(set(df_all['tag_text'].str.split().sum()))
+
 
     if df_all is None:
         return render_template('index.html', result=None, popular_games=[], trending_games=[])
@@ -108,11 +113,15 @@ def home():
             result = []
 
     return render_template(
-    'index.html',
-    result=result,
-    popular_games=popular_games,
-    trending_games=trending_games,
-    new_trending_games=new_trending_games
-)
+        'index.html',
+        result=result,
+        popular_games=popular_games,
+        trending_games=trending_games,
+        new_trending_games=new_trending_games,
+        all_genres=all_genres,
+        all_tags=all_tags
+    )
+     
+     
 if __name__ == '__main__':
     app.run(debug=True)
