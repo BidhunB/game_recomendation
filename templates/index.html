@@ -97,12 +97,14 @@
                             <span class="text-white">{{ tag.strip()[:12] }}</span>{% if not loop.last %}, {% endif %}
                           {% endfor %}
                         </div>
+                        <!-- rating-->
                         <div class="flex items-center justify-between mt-auto pt-4">
                           <span class="text-lime-400 text-lg font-bold">{{ game.rating }}</span>
                           <svg class="w-5 h-5 text-lime-400 inline" fill="currentColor" viewBox="0 0 20 20">
                             <polygon points="10,1 12.59,7.36 19.51,7.36 13.97,11.64 16.56,17.99 10,13.71 3.44,17.99 6.03,11.64 0.49,7.36 7.41,7.36"/>
                           </svg>
                         </div>
+                        
                       </div>
                     </div>
                   {% endfor %}
@@ -196,7 +198,8 @@
         const option = document.createElement('div');
         option.classList.add('cursor-pointer', 'hover:bg-lime-400', 'px-4', 'py-2');
         option.textContent = match;
-        option.addEventListener('click', () => {
+        option.addEventListener('mousedown', (e) => {
+          e.preventDefault();
           const parts = input.value.split(',');
           parts[parts.length - 1] = match;
           input.value = parts.join(', ') + ', ';
