@@ -1,5 +1,5 @@
+gunicorn
 flask
 requests
 pandas
 scikit-learn
-gunicorn
