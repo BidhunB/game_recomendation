@@ -12,7 +12,7 @@ app = Flask(__name__)
 def fetch_game_data(date_filter=None):
     url = (
         f"https://api.rawg.io/api/games"
-        f"?key=711187b0527641ab907077c4c278a39c"
+        f"?key={os.getenv('RAWG_API_KEY')}"
         f"&page_size=40"
     )
     if date_filter:
